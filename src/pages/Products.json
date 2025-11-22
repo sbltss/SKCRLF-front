@@ -1,0 +1,94 @@
+[
+  {
+    "id": 1,
+    "image": "/Image/product1.jpg",
+    "secondImage": "/Image/product1.jpg",
+    "Productname": "Blaze Runner",
+    "price": "1000.00"
+  },
+  {
+    "id": 2,
+    "image": "/Image/product2.jpg",
+    "secondImage": "/Image/product2.jpg",
+    "Productname": "Nova Sprint",
+    "price": "999.00",
+    "tag": "New"
+  },
+  {
+    "id": 3,
+    "image": "/Image/product3.jpg",
+    "secondImage": "/Image/product3.jpg",
+    "Productname": "Velocity Glide",
+    "price": "1999.00",
+    "tag": "New"
+  },
+  {
+    "id": 4,
+    "image": "/Image/product4.jpg",
+    "secondImage": "/Image/product4.jpg",
+    "Productname": "FlashStep Pro",
+    "price": "599.00",
+    "tag": "Sale"
+  },
+  {
+    "id": 5,
+    "image": "/Image/product5.jpg",
+    "secondImage": "/Image/product5.jpg",
+    "Productname": "Summit Trek",
+    "price": "2450.00"
+  },
+  {
+    "id": 6,
+    "image": "/Image/product6.jpg",
+    "secondImage": "/Image/product6.jpg",
+    "Productname": "Urban Pulse",
+    "price": "499.00",
+    "tag": "Sale"
+  },
+  {
+    "id": 7,
+    "image": "/Image/product7.jpg",
+    "secondImage": "/Image/product7.jpg",
+    "Productname": "Skyline Runner",
+    "price": "1100.00",
+    "tag": "New"
+  },
+  {
+    "id": 8,
+    "image": "/Image/product8.jpg",
+    "secondImage": "/Image/product8.jpg",
+    "Productname": "TrailBlazer Boot",
+    "price": "750.00"
+  },
+  {
+    "id": 9,
+    "image": "/Image/product9.jpg",
+    "secondImage": "/Image/product9.jpg",
+    "Productname": "StreetFlex Sneakers",
+    "price": "1200.00",
+    "tag": "Sale"
+  },
+  {
+    "id": 10,
+    "image": "/Image/product10.jpg",
+    "secondImage": "/Image/product10.jpg",
+    "Productname": "Urban Glide",
+    "price": "980.00"
+  },
+  {
+    "id": 11,
+    "image": "/Image/product11.jpg",
+    "secondImage": "/Image/product11.jpg",
+    "Productname": "Momentum Runner",
+    "price": "1350.00",
+    "tag": "New"
+  },
+  {
+    "id": 12,
+    "image": "/Image/product12.jpg",
+    "secondImage": "/Image/product12.jpg",
+    "Productname": "Classic Step",
+    "price": "650.00",
+    "tag": "Sale"
+  }
+]
