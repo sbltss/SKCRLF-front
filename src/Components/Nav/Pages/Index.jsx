@@ -1,3 +1,4 @@
+// Product listing page with search, filter and sort controls
 import React, { useEffect, useState } from 'react';
 import productData from './Products.json';
 
@@ -15,7 +16,7 @@ function Index() {
     return () => window.removeEventListener('searchQueryChanged', handleSearchQuery);
   }, []);
 
-  // Filter & Sort Product
+  // Filter & sort products based on selected option and search query
   const handleFilterSort = () => {
     let filtered = [...productData];
 
@@ -34,7 +35,7 @@ function Index() {
       filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
     }
 
-    // Apply Search Filter
+    // Apply search filter
     if (searchQuery.trim()) {
       filtered = filtered.filter(product =>
         product.Productname.toLowerCase().includes(searchQuery)
@@ -50,7 +51,7 @@ function Index() {
 
   const displayedProduct = handleFilterSort();
 
-  // Add to Cart
+  // Add product to cart and notify nav via window event
   const addToCart = (product) => {
     const existing = JSON.parse(localStorage.getItem('cart')) || [];
     const alreadyCart = existing.find(p => p.id === product.id);
@@ -89,7 +90,7 @@ function Index() {
               }"
             </div>
 
-            {/* Filter Dropdown */}
+          {/* Filter Dropdown */}
             <div>
               <select
                 className="form-select py-2 fs-6"

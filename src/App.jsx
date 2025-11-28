@@ -1,3 +1,4 @@
+// Application shell: defines top-level layout and routes
 import './App.css'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import Nav from './Components/Nav/Nav'
@@ -15,12 +16,14 @@ function App() {
   const showNav = !!isAuthenticated
   return (
     <>
+      {/* Show Nav only when authenticated */}
       {showNav && <Nav />}
       <Routes>
         <Route path="/login" element={<Login />} />
+        {/* Guard routes that require a persisted user in the store */}
         <Route element={<UserStoreGuard />}>
-          <Route path="/" element={<Index />} />
           <Route path="/shoes" element={<Shoes />} />
+          {/* Additional auth check for protected pages */}
           <Route element={<ProtectedRoute />}>
             <Route path="/account" element={<Account />} />
           </Route>

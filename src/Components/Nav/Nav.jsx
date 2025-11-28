@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth/AuthProvider";
 import { getAccessToken } from "../../lib/tokenStorage";
 
@@ -9,6 +9,13 @@ function Nav() {
   const [cartCount, setCartCount] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [shrunk, setShrunk] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const headerRef = useRef(null)
+  const sentinelRef = useRef(null)
+  const lastScrollY = useRef(window.scrollY || 0)
+  const ticking = useRef(false)
 
   useEffect(() => {
     const updateCart = () => {
@@ -23,7 +30,52 @@ function Nav() {
     return () => window.removeEventListener("cartUpdated", updateCart);
   }, []);
 
-  // Remove item from cart
+  useEffect(() => {
+    document.body.classList.add('with-fixed-nav')
+    return () => { document.body.classList.remove('with-fixed-nav') }
+  }, [])
+
+  useEffect(() => {
+    // Dynamically adjust reserved space when nav shrinks/expands
+    const top = getComputedStyle(document.documentElement).getPropertyValue('--nav-height-' + (shrunk ? 'shrunk' : 'expanded')) || '80px'
+    document.body.style.paddingTop = top
+    if (shrunk) document.body.classList.add('nav-is-shrunk')
+    else document.body.classList.remove('nav-is-shrunk')
+  }, [shrunk])
+
+  useEffect(() => {
+    const s = sentinelRef.current
+    if (!s) return
+    const io = new IntersectionObserver((entries) => {
+      const e = entries[0]
+      setScrolled(!e.isIntersecting)
+    }, { root: null, threshold: 0 })
+    io.observe(s)
+    return () => io.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (ticking.current) return
+      ticking.current = true
+      requestAnimationFrame(() => {
+        const y = window.scrollY || 0
+        if (y > lastScrollY.current + 8) setShrunk(true)
+        else if (y < lastScrollY.current - 8) setShrunk(false)
+        lastScrollY.current = y
+        ticking.current = false
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') setMobileOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   const removeItem = (id) => {
     const updated = cartItems.filter((item) => item.id !== id);
 
@@ -34,88 +86,83 @@ function Nav() {
     window.dispatchEvent(new Event("cartUpdated"));
   };
 
-  // Calculate total cart price
   const totalPrice = cartItems
     .reduce((sum, item) => sum + parseFloat(item.price), 0)
     .toFixed(2);
 
   return (
     <>
-      {/* Header Navigation */}
       <div
-        className="px-5 bg-light"
+        ref={headerRef}
+        className={`nav-shell ${scrolled ? 'is-scrolled' : ''} ${shrunk ? 'is-shrunk' : ''}`}
         aria-hidden={!authed}
-        style={{ opacity: authed ? 1 : 0, transition: "opacity 200ms ease" }}
+        style={{ opacity: authed ? 1 : 0, pointerEvents: authed ? 'auto' : 'none' }}
       >
-        <nav
-          className="navbar navbar-light justify-content-between px-5 w-100"
-          style={{ pointerEvents: authed ? "auto" : "none" }}
-        >
-
-          {/* Logo */}
-          <a href="#" className="navbar-brand fs-1 fw-bold" style={{ color: 'red' }}>
-            SKCRLF
-          </a>
-
-          {/* Search Bar */}
-          <div className="product-search flex-grow-1 d-flex justify-content-center">
+        <div className="nav-inner">
+          <a href="#" className="nav-brand">SKCRLF</a>
+          <button className="nav-burger" aria-label="Menu" aria-expanded={mobileOpen} onClick={() => setMobileOpen((v) => !v)}>
+            <span />
+          </button>
+          <div className="nav-search">
             <input
               type="text"
               className="form-control"
               placeholder="Search..."
-              style={{ maxWidth: "500px" }}
               disabled={!authed}
               onChange={(e) => {
-
-                const event = new CustomEvent("searchQueryChanged", {
-                  detail: e.target.value,
-                });
+                const event = new CustomEvent("searchQueryChanged", { detail: e.target.value });
                 window.dispatchEvent(event);
               }}
             />
           </div>
-
-
-
-        
-
-          {/* Cart Icon */}
-          <div
-            className="cart-icon position-relative"
-            style={{ cursor: "pointer" }}
-            onClick={() => setIsCartOpen(true)}
-          >
-            <i className="bi bi-bag fs-4"></i>
-
-            {/* Cart Count */}
-            <span className="cart-count">{cartCount}</span>
+          <div className="nav-actions">
+            <div className="cart-icon" onClick={() => setIsCartOpen(true)}>
+              <i className="bi bi-bag"></i>
+              <span className="cart-count">{cartCount}</span>
+            </div>
+            <button
+              className="nav-logout"
+              aria-label="Logout"
+              tabIndex={0}
+              disabled={!authed}
+              onClick={() => logout()}
+            >
+              Logout
+            </button>
           </div>
-
-          <button
-            className="btn btn-danger ms-3 px-3 py-2"
-            style={{ transition: "opacity 200ms ease" }}
-            aria-label="Logout"
-            tabIndex={0}
-            disabled={!authed}
-            onClick={() => logout()}
-          >
-            Logout
-          </button>
-        </nav>
+        </div>
+        {mobileOpen && (
+          <div className="nav-mobile" role="dialog" aria-modal="true">
+            <div className="nav-mobile-content">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search..."
+                disabled={!authed}
+                onChange={(e) => {
+                  const event = new CustomEvent("searchQueryChanged", { detail: e.target.value });
+                  window.dispatchEvent(event);
+                }}
+              />
+              <div className="nav-mobile-actions">
+                <button className="nav-logout" disabled={!authed} onClick={() => logout()}>Logout</button>
+                <button className="nav-close" onClick={() => setMobileOpen(false)} aria-label="Close">Close</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+      <div className="nav-sentinel" ref={sentinelRef} />
 
-      {/* Sidebar Cart */}
       <div
         className={`cart-sidebar ${isCartOpen ? "open" : ""}`}
         aria-hidden={!authed}
         style={{ pointerEvents: authed ? "auto" : "none" }}
       >
 
-        {/* Cart Header */}
         <div className="cart-header d-flex justify-content-between align-items-center p-3">
           <h5 className="m-0">Your Cart</h5>
 
-          {/* Close Button */}
           <button
             className="btn btn-sm btn-outline-dark bg-dark text-white"
             onClick={() => setIsCartOpen(false)}
@@ -124,20 +171,13 @@ function Nav() {
           </button>
         </div>
 
-        {/* Cart Body */}
         <div className="cart-body p-3">
           {cartItems.length === 0 ? (
-
-            // Empty Cart Message
             <p className="alert alert-danger">Your Cart Is Empty</p>
 
           ) : (
-
-            // Cart Items List
             cartItems.map((item) => (
               <div key={item.id} className="d-flex mb-3 align-items-center">
-
-                {/* Item Image */}
                 <img
                   src={item.image}
                   width={60}
@@ -145,14 +185,10 @@ function Nav() {
                   className="me-3 rounded"
                   alt=""
                 />
-
-                {/* Item Details */}
                 <div className="flex-grow-1">
                   <h6 className="mb-1">{item.Productname}</h6>
                   <p className="mb-1">${item.price}</p>
                 </div>
-
-                {/* Remove Button */}
                 <button
                   className="btn btn-sm bg-dark text-white"
                   onClick={() => removeItem(item.id)}
@@ -164,12 +200,10 @@ function Nav() {
           )}
         </div>
 
-        {/* Cart Footer */}
         {cartItems.length > 0 && (
           <div className="cart-footer p-3 border-top">
             <h6>Total : ${totalPrice}</h6>
 
-            {/* Checkout Button */}
             <button className="btn btn-dark w-100 mt-2">Checkout</button>
           </div>
         )}

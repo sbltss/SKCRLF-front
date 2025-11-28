@@ -1,15 +1,19 @@
+// Lightweight HTTP client and React Query helpers for local API
 import axios, { AxiosError } from 'axios'
 import { useQuery } from '@tanstack/react-query'
 
+// Generic API response wrapper
 export type ApiResponse<T> = {
   data: T
 }
 
+// Axios instance targeting local backend
 export const httpClient = axios.create({
   baseURL: import.meta.env.VITE_LOCAL_API_URL || 'http://localhost:8080',
   withCredentials: true,
 })
 
+// Typed GET helper with basic error normalization
 export async function getFromApi<T>(path: string): Promise<T> {
   try {
     const res = await httpClient.get<T>(path)
@@ -20,6 +24,7 @@ export async function getFromApi<T>(path: string): Promise<T> {
   }
 }
 
+// React Query hook for simple GET requests
 export function useApiGet<T>(path: string, enabled = true) {
   return useQuery({
     queryKey: ['api', path],

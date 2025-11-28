@@ -1,3 +1,4 @@
+// Error boundary to catch and display a fallback UI on runtime errors
 import React from 'react'
 
 type Props = { children: React.ReactNode }
@@ -11,6 +12,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
   static getDerivedStateFromError() {
     return { hasError: true }
   }
+  // Optionally log errors or report to monitoring here
   componentDidCatch() {}
   render() {
     if (this.state.hasError) {

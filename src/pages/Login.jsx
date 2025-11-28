@@ -1,3 +1,4 @@
+// Login page: handles validation, remember-me, and navigation on success
 import { useEffect, useState } from 'react'
 import { useAuth } from '../auth/AuthProvider'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -15,6 +16,7 @@ export default function Login() {
   const loc = useLocation()
   const { currentUser } = useUserStore()
   useEffect(() => {
+    // If a user already exists in store or is authenticated, redirect
     if (currentUser) {
       nav('/shoes', { replace: true })
     } else if (isAuthenticated) {
@@ -31,6 +33,7 @@ export default function Login() {
     setErrors(errs)
     setTouched(true)
     if (Object.keys(errs).length) return
+    // Trigger auth provider login; errors are surfaced via loginError
     login({ username, password, remember }).catch(() => {})
   }
   return (

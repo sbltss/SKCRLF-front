@@ -1,8 +1,10 @@
+// Authentication service: login/logout/refresh/me helpers
 import api from '../lib/axios'
 import { httpClient } from './http'
 import { useUserStore } from '../stores/userStore'
 import { setTokens, clearTokens, getRememberMe } from '../lib/tokenStorage'
 
+// Log in via local API, persist tokens and normalize user into store
 export async function login(payload) {
   const res = await httpClient.post('/users/login', payload)
   const a = res.data?.accessToken
@@ -36,6 +38,7 @@ export async function login(payload) {
   return res.data
 }
 
+// Logout: best-effort server call, then clear tokens
 export async function logout() {
   try {
     await api.post('/auth/logout')
@@ -43,6 +46,7 @@ export async function logout() {
   clearTokens()
 }
 
+// Refresh tokens using axios client
 export async function refresh() {
   const res = await api.post('/auth/refresh', {})
   const a = res.data?.accessToken
@@ -52,6 +56,7 @@ export async function refresh() {
   return res.data
 }
 
+// Get current user from backend
 export async function me() {
   const res = await api.get('/auth/me')
   return res.data

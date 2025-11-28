@@ -1,5 +1,7 @@
+// Guard for routes that require a persisted user in zustand store
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
+// Check if a valid user exists in persisted store state
 function hasStoredUser() {
   try {
     const raw = localStorage.getItem('userStore')

@@ -1,12 +1,15 @@
+// Resolve image URLs for shoes based on ID using local assets
 const BASE = (import.meta.env.VITE_ASSETS_BASE || '/src/assets').replace(/\/$/, '')
 const ROOT = import.meta.env.BASE_URL || '/'
 
+// Build an asset URL for the given id and extension
 function buildUrl(id: number | string, ext: string, absolute = true) {
   const filename = `${id}.${ext}`
   const path = `${BASE}/${filename}`
   return absolute ? path : path.replace(ROOT, '')
 }
 
+// Check if a URL exists via HEAD, fallback to GET without cache
 async function urlExists(url: string) {
   try {
     const res = await fetch(url, { method: 'HEAD' })
@@ -20,6 +23,7 @@ async function urlExists(url: string) {
   }
 }
 
+// Try common image extensions and return the first matching asset URL
 export async function resolveImagePath(shoeId: number | string) {
   const idStr = String(shoeId).trim()
   if (!idStr || /[^\w\-]/.test(idStr)) {
@@ -35,6 +39,7 @@ export async function resolveImagePath(shoeId: number | string) {
   return null
 }
 
+// Map API data to include an imagePath resolved from assets; use fallback when missing
 export async function mapShoeImages(apiData: any[], options?: { absolute?: boolean; fallback?: string }) {
   const absolute = options?.absolute !== false
   const fallback = options?.fallback || '/Image/product1.jpg'

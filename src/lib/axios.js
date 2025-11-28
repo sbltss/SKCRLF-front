@@ -1,3 +1,4 @@
+// Preconfigured axios instance with auth header and token refresh handling
 import axios from 'axios'
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from './tokenStorage'
 
@@ -6,12 +7,14 @@ const api = axios.create({
   withCredentials: true,
 })
 
+// Read a cookie value by name (used for CSRF)
 function getCookie(name) {
   const value = `; ${document.cookie}`
   const parts = value.split(`; ${name}=`)
   if (parts.length === 2) return parts.pop().split(';').shift()
 }
 
+// Attach Bearer token and CSRF header to each request
 api.interceptors.request.use((config) => {
   const token = getAccessToken()
   if (token) config.headers.Authorization = `Bearer ${token}`
@@ -20,8 +23,10 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Single-flight promise for refreshing tokens to prevent concurrent refreshes
 let refreshing = null
 
+// On 401, attempt a token refresh once, then retry the original request
 api.interceptors.response.use(
   (res) => res,
   async (error) => {

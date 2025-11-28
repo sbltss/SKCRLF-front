@@ -10,7 +10,7 @@ import img10 from './10.png'
 import img11 from './11.png'
 import img12 from './12.png'
 
-export default {
+export {
   img2,
   img3,
   img4,

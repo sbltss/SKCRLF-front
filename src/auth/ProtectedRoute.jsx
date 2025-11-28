@@ -1,3 +1,4 @@
+// Route guard that redirects unauthenticated users to the login page
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from './AuthProvider'
 
